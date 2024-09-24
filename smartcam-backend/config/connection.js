@@ -1,6 +1,5 @@
 const uri = process.env.ATLAS_URI || "";
 
-console.log
 
 const mongoose = require('mongoose');
 
