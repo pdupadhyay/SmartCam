@@ -9,6 +9,7 @@
 /smartcam-backend/.env
 /smartcam-desktop/.env
 /smartcam-frontend/venv
+/smartcam-backend/venv
 # testing
 /coverage
 
@@ -25,3 +26,4 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+node_modules

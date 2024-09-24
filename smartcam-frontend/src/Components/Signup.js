@@ -61,6 +61,16 @@ export default function SignUp() {
     const [dobErrorMessage, setDobErrorMessage] = React.useState('');
     const [phoneError, setPhoneError] = React.useState(false);
     const [phoneErrorMessage, setPhoneErrorMessage] = React.useState('');
+    const [user, setUser] = React.useState({
+        name: '',
+        email: '',
+        password: '',
+        fid: '',
+        gender: '',
+        dob: '',
+        phoneNumber: '',
+        image: null
+    })
 
     React.useEffect(() => {
         // Check if there is a preferred mode in localStorage
@@ -76,14 +86,19 @@ export default function SignUp() {
         }
     }, []);
 
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setUser({ ...user, [name]: value})
+    }
+
     const validateInputs = () => {
-        const email = document.getElementById('email');
-        const password = document.getElementById('password');
-        const name = document.getElementById('name');
-        const fid = document.getElementById('fid');
-        const gender = document.getElementById('gender');
-        const dob = document.getElementById('dob');
-        const phone = document.getElementById('phoneNumber');
+        const email = user.email;
+        const password = user.password;
+        const name = user.name;
+        const fid = user.fid;
+        const gender = user.gender;
+        const dob = user.dob;
+        const phone = user.phoneNumber
 
         let isValid = true;
 
@@ -158,13 +173,38 @@ export default function SignUp() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            name: data.get('name'),
-            lastName: data.get('lastName'),
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        const imageInput = document.getElementById('image');
+        const imageFile = imageInput.files[0];
+
+        const formData = new FormData();
+        formData.append('name', user.name);
+        formData.append('email', user.email);
+        formData.append('password', user.password);
+        formData.append('fid', user.fid);
+        formData.append('gender', user.gender);
+        formData.append('dob', user.dob);
+        formData.append('phoneNumber', user.phoneNumber);
+        formData.append('image', imageFile);
+
+        if(validateInputs) {
+            fetch('http://localhost:5050/api/faculty/register',
+                {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    console.log(data);
+                    if (data.token.length > 0) {
+                        console.log('Logged in successfully');
+                        window.location.href = '/';
+                    } else {
+                        console.log('Login failed');
+                    }
+                })
+                .catch(error => console.log('Error:', error)
+                )
+        }
     };
 
     return (
@@ -186,7 +226,7 @@ export default function SignUp() {
                             <FormControl>
                                 <FormLabel htmlFor="name">Full name</FormLabel>
                                 <TextField autoComplete="name" name="name" required fullWidth id="name" placeholder="Full Name"
-                                    error={nameError} helperText={nameErrorMessage} color={nameError ? 'error' : 'primary'} />
+                                    error={nameError} helperText={nameErrorMessage} color={nameError ? 'error' : 'primary'} onChange={handleChange} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="email">Email</FormLabel>
@@ -200,7 +240,7 @@ export default function SignUp() {
                                     variant="outlined"
                                     error={emailError}
                                     helperText={emailErrorMessage}
-                                    color={passwordError ? 'error' : 'primary'}
+                                    color={passwordError ? 'error' : 'primary'} onChange={handleChange}
                                 />
                             </FormControl>
                             <FormControl>
@@ -216,17 +256,17 @@ export default function SignUp() {
                                     variant="outlined"
                                     error={passwordError}
                                     helperText={passwordErrorMessage}
-                                    color={passwordError ? 'error' : 'primary'}
+                                    color={passwordError ? 'error' : 'primary'} onChange={handleChange}
                                 />
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="fid">Faculty ID</FormLabel>
                                 <TextField autoComplete="fid" name="fid" required fullWidth id="fid" placeholder="Faculty ID/UID"
-                                    error={fidError} helperText={fidErrorMessage} color={fidError ? 'error' : 'primary'} />
+                                    error={fidError} helperText={fidErrorMessage} color={fidError ? 'error' : 'primary'} onChange={handleChange}/>
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="gender">Gender</FormLabel>
-                                <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group" id='gender'>
+                                <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="gender" id='gender' onChange={handleChange}>
                                     <FormControlLabel value="Male" control={<Radio />} label="Male" />
                                     <FormControlLabel value="Female" control={<Radio />} label="Female" />
                                     <FormControlLabel value="Other" control={<Radio />} label="Other" />
@@ -235,18 +275,22 @@ export default function SignUp() {
                             <FormControl>
                                 <FormLabel htmlFor="dob">Date of Birth</FormLabel>
                                 <TextField type="date" autoComplete="dob" name="dob" required fullWidth id="dob" placeholder="Date of Birth"
-                                    error={dobError} helperText={dobErrorMessage} color={dobError ? 'error' : 'primary'} />
+                                    error={dobError} helperText={dobErrorMessage} color={dobError ? 'error' : 'primary'} onChange={handleChange}/>
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="phoneNumber">Phone Number</FormLabel>
                                 <TextField autoComplete="phoneNumber" name="phoneNumber" required fullWidth id="phoneNumber" placeholder="+1 2345678900"
-                                    error={phoneError} helperText={phoneErrorMessage} color={phoneError ? 'error' : 'primary'} />
+                                    error={phoneError} helperText={phoneErrorMessage} color={phoneError ? 'error' : 'primary'} onChange={handleChange}/>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel htmlFor='image'>Upload your image</FormLabel>
+                                <input type='file' id='image' name='image' accept='image/*' onChange={handleChange}/>
                             </FormControl>
                             <Button
                                 type="submit"
                                 fullWidth
                                 variant="contained"
-                                onClick={validateInputs}
+                                onClick={handleSubmit}
                             >
                                 Sign up
                             </Button>

@@ -60,8 +60,8 @@ router.post("/register",upload.any('profilePicture'), async (req, res) => {
      } catch(err){
  
         console.log(err)
-         res.status(500).json({ message: 'Server error' });
-     }
- });
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 
- module.exports = router;
+module.exports = router;
