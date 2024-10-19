@@ -11,6 +11,7 @@ const userSchema = new Schema({
   fid:{type:String},
   phone:{type:String},
   profilePicturePath: {type:String},
+  facialEncoding:{type:Array}
    
 }, { timestamps: true });
 

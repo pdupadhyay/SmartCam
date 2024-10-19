@@ -10,7 +10,7 @@ const path = require('path');
 const PORT = process.env.PORT || 5050;
 const app = express();
 
-db()
+
 app.use(cors());
 app.use(express.json());
 
@@ -22,7 +22,15 @@ app.use("/api/auth", auth);
 app.use('/api/faculty', faculty);
 
 
-// start the Express server
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+
+
+db().then(() => {
+  console.log("Database connection established...");
+  app.listen(5050, () => {
+    console.log("Server is successfully listening on port 5050...");
+  });
+})
+.catch((err) => {
+  console.log("Error connecting to the database:", err.message);
+  console.error("Database cannot be connected!!");
 });

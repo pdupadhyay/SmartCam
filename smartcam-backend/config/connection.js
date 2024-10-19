@@ -1,9 +1,10 @@
 const uri = process.env.ATLAS_URI || "";
 
+
 const mongoose = require('mongoose');
 
 const db = uri
-console.log(db)
+
 
 const connectDB = async () => {
     try {
