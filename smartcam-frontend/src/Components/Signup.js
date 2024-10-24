@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
+import bgimage from './../Content/BG.png'
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -40,13 +41,15 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
     backgroundRepeat: 'no-repeat',
     ...theme.applyStyles('dark', {
         backgroundImage:
-            'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
+            `url(${bgimage})`,
+        backgroundSize: 'cover',
+        backgroundAttachment: 'fixed'
+        // 'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
     }),
 }));
 
 export default function SignUp() {
-    const [mode, setMode] = React.useState('light');
-    const defaultTheme = createTheme({ palette: { mode } });
+    const defaultTheme = createTheme({ palette: { mode: 'dark' } });
     const [emailError, setEmailError] = React.useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
     const [passwordError, setPasswordError] = React.useState(false);
@@ -72,23 +75,9 @@ export default function SignUp() {
         image: null
     })
 
-    React.useEffect(() => {
-        // Check if there is a preferred mode in localStorage
-        const savedMode = localStorage.getItem('themeMode');
-        if (savedMode) {
-            setMode(savedMode);
-        } else {
-            // If no preference is found, it uses system preference
-            const systemPrefersDark = window.matchMedia(
-                '(prefers-color-scheme: dark)',
-            ).matches;
-            setMode(systemPrefersDark ? 'dark' : 'light');
-        }
-    }, []);
-
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setUser({ ...user, [name]: value})
+        setUser({ ...user, [name]: value })
     }
 
     const validateInputs = () => {
@@ -100,7 +89,7 @@ export default function SignUp() {
         const dob = user.dob;
         const phone = user.phoneNumber
 
-        let isValid = true;
+        let isValid = false;
 
         if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
             setEmailError(true);
@@ -183,19 +172,20 @@ export default function SignUp() {
         formData.append('fid', user.fid);
         formData.append('gender', user.gender);
         formData.append('dob', user.dob);
-        formData.append('phoneNumber', user.phoneNumber);
+        formData.append('phone', user.phoneNumber);
         formData.append('image', imageFile);
 
-        if(validateInputs) {
+        if (validateInputs()) {
             fetch('http://localhost:5050/api/faculty/register',
                 {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    credentials: 'include'
                 })
                 .then(response => response.json())
                 .then((data) => {
                     console.log(data);
-                    if (data.token.length > 0) {
+                    if (data.status === 201) {
                         console.log('Logged in successfully');
                         window.location.href = '/';
                     } else {
@@ -211,13 +201,7 @@ export default function SignUp() {
         <ThemeProvider theme={defaultTheme}>
             <CssBaseline enableColorScheme />
             <SignUpContainer direction="column" justifyContent="space-between">
-                <Stack
-                    sx={{
-                        justifyContent: 'center',
-                        height: '100%',
-                        p: 2,
-                    }}
-                >
+                <Stack sx={{ justifyContent: 'center', height: '100%', p: 2 }}>
                     <Card variant="outlined">
                         <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
                             Sign up
@@ -230,68 +214,43 @@ export default function SignUp() {
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="email">Email</FormLabel>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="email"
-                                    placeholder="your@email.com"
-                                    name="email"
-                                    autoComplete="email"
-                                    variant="outlined"
-                                    error={emailError}
-                                    helperText={emailErrorMessage}
-                                    color={passwordError ? 'error' : 'primary'} onChange={handleChange}
-                                />
+                                <TextField required fullWidth id="email" placeholder="your@email.com" name="email" autoComplete="email" variant="outlined" error={emailError}
+                                    helperText={emailErrorMessage} color={passwordError ? 'error' : 'primary'} onChange={handleChange} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="password">Password</FormLabel>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    placeholder="••••••"
-                                    type="password"
-                                    id="password"
-                                    autoComplete="new-password"
-                                    variant="outlined"
-                                    error={passwordError}
-                                    helperText={passwordErrorMessage}
-                                    color={passwordError ? 'error' : 'primary'} onChange={handleChange}
-                                />
+                                <TextField required fullWidth name="password" placeholder="••••••" type="password" id="password" autoComplete="new-password" variant="outlined"
+                                    error={passwordError} helperText={passwordErrorMessage} color={passwordError ? 'error' : 'primary'} onChange={handleChange} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="fid">Faculty ID</FormLabel>
                                 <TextField autoComplete="fid" name="fid" required fullWidth id="fid" placeholder="Faculty ID/UID"
-                                    error={fidError} helperText={fidErrorMessage} color={fidError ? 'error' : 'primary'} onChange={handleChange}/>
+                                    error={fidError} helperText={fidErrorMessage} color={fidError ? 'error' : 'primary'} onChange={handleChange} />
                             </FormControl>
-                            <FormControl>
+                            <FormControl error={genderError}>
                                 <FormLabel htmlFor="gender">Gender</FormLabel>
                                 <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="gender" id='gender' onChange={handleChange}>
                                     <FormControlLabel value="Male" control={<Radio />} label="Male" />
                                     <FormControlLabel value="Female" control={<Radio />} label="Female" />
                                     <FormControlLabel value="Other" control={<Radio />} label="Other" />
                                 </RadioGroup>
+                                {genderError && <Typography color="error">{genderErrorMessage}</Typography>}
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="dob">Date of Birth</FormLabel>
                                 <TextField type="date" autoComplete="dob" name="dob" required fullWidth id="dob" placeholder="Date of Birth"
-                                    error={dobError} helperText={dobErrorMessage} color={dobError ? 'error' : 'primary'} onChange={handleChange}/>
+                                    error={dobError} helperText={dobErrorMessage} color={dobError ? 'error' : 'primary'} onChange={handleChange} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor="phoneNumber">Phone Number</FormLabel>
                                 <TextField autoComplete="phoneNumber" name="phoneNumber" required fullWidth id="phoneNumber" placeholder="+1 2345678900"
-                                    error={phoneError} helperText={phoneErrorMessage} color={phoneError ? 'error' : 'primary'} onChange={handleChange}/>
+                                    error={phoneError} helperText={phoneErrorMessage} color={phoneError ? 'error' : 'primary'} onChange={handleChange} />
                             </FormControl>
                             <FormControl>
                                 <FormLabel htmlFor='image'>Upload your image</FormLabel>
-                                <input type='file' id='image' name='image' accept='image/*' onChange={handleChange}/>
+                                <input type='file' id='image' name='image' accept='image/*' onChange={handleChange} />
                             </FormControl>
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                onClick={handleSubmit}
-                            >
+                            <Button type="submit" fullWidth variant="contained" onClick={handleSubmit}>
                                 Sign up
                             </Button>
                             <Divider>
@@ -300,11 +259,7 @@ export default function SignUp() {
                             <Typography sx={{ textAlign: 'center' }}>
                                 Already have an account?{' '}
                                 <span>
-                                    <Link
-                                        href="/material-ui/getting-started/templates/sign-in/"
-                                        variant="body2"
-                                        sx={{ alignSelf: 'center' }}
-                                    >
+                                    <Link href="/login" variant="body2" sx={{ alignSelf: 'center' }} >
                                         Sign in
                                     </Link>
                                 </span>

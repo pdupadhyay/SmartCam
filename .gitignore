@@ -10,6 +10,7 @@
 /smartcam-desktop/.env
 /smartcam-frontend/venv
 /smartcam-backend/venv
+/smartcam-desktop/venv
 # testing
 /coverage
 

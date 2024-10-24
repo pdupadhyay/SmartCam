@@ -9,11 +9,16 @@ const path = require('path');
 
 const PORT = process.env.PORT || 5050;
 const app = express();
+const cookieParser = require('cookie-parser');
 
-
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+}));
 app.use(express.json());
 
+
+app.use(cookieParser());
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -30,7 +35,7 @@ db().then(() => {
     console.log("Server is successfully listening on port 5050...");
   });
 })
-.catch((err) => {
-  console.log("Error connecting to the database:", err.message);
-  console.error("Database cannot be connected!!");
-});
+  .catch((err) => {
+    console.log("Error connecting to the database:", err.message);
+    console.error("Database cannot be connected!!");
+  });

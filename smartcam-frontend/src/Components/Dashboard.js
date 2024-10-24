@@ -1,9 +1,11 @@
 // import * as React from 'react';
 
-// import { alpha } from '@mui/material/styles';
-// import CssBaseline from '@mui/material/CssBaseline';
-// import Box from '@mui/material/Box';
-// import Stack from '@mui/material/Stack';
+import { alpha, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import { ThemeProvider } from '@emotion/react';
+import Sidebar from './Sidebar';
 // import AppNavbar from './components/AppNavbar';
 // import Header from './components/Header';
 // import MainGrid from './components/MainGrid';
@@ -60,10 +62,13 @@
 // }
 
 const Dashboard = () => {
+    const defaultTheme = createTheme({ palette: { mode: 'dark' } });
     return (
-        <div>
-            <h1>Dashboard</h1>
-        </div>
+        <ThemeProvider theme={defaultTheme}>
+            <div style={{ display: 'flex', minHeight: '100vh' }}>
+                <h1>Dashboard</h1>
+            </div>
+        </ThemeProvider>
     )
 }
 

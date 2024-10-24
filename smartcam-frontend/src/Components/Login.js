@@ -15,6 +15,7 @@ import { createTheme, styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
 import { ThemeProvider } from '@emotion/react';
 import { useState } from 'react';
+import bgimage from './../Content/BG.png'
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -33,6 +34,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
         boxShadow:
             'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
     }),
+    zIndex: 2
 }));
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
@@ -49,10 +51,25 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
         backgroundRepeat: 'no-repeat',
         ...theme.applyStyles('dark', {
             backgroundImage:
-                'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
+                `url(${bgimage})`,
+            backgroundSize: 'cover',
+            backgroundAttachment: 'fixed',
+            height: '100%',
+            zIndex: 1
+            // 'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
         }),
     },
 }));
+
+const ErrorPopup = ({ message, onClose }) => (
+    <div style={{
+        position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', padding: '20px', backgroundColor: 'black',
+        boxShadow: '0 0 10px rgba(0,0,0,0.5)', zIndex: 1000, textAlign: 'center', fontFamily: 'cursive'
+    }}>
+        <p>{message}</p>
+        <button onClick={onClose}>Close</button>
+    </div>
+);
 
 export default function SignIn(props) {
     const [emailError, setEmailError] = useState(false);
@@ -61,6 +78,7 @@ export default function SignIn(props) {
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
     const [open, setOpen] = useState(false);
     const defaultTheme = createTheme({ palette: { mode: 'dark' } });
+    const [errorMessage, setErrorMessage] = useState('');
     const [userCredentials, setUserCredentials] = useState({
         email: '',
         password: ''
@@ -87,20 +105,27 @@ export default function SignIn(props) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userCredentials)
+                body: JSON.stringify(userCredentials),
+                credentials: 'include'
             })
-            .then(response => response.json())
+            .then(
+                response => response.json())
             .then((data) => {
                 console.log(data);
-                if (data.token.length > 0) {
+                if (!data.message) {
                     console.log('Logged in successfully');
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('userName', data.name);
                     window.location.href = '/';
                 } else {
                     console.log('Login failed');
+                    setErrorMessage('Login failed. Please check your credentials and try again.');
                 }
             })
-            .catch(error => console.log('Error:', error)
-            )
+            .catch(error => {
+                console.log('Error:', error);
+                setErrorMessage('Login failed. Please check your credentials and try again.');
+            })
     };
 
     const validateInputs = () => {
@@ -134,6 +159,7 @@ export default function SignIn(props) {
         <ThemeProvider theme={defaultTheme}>
             <CssBaseline enableColorScheme />
             <SignInContainer direction="column" justifyContent="space-between">
+                {errorMessage && <ErrorPopup message={errorMessage} onClose={() => setErrorMessage('')} />}
                 <Card variant="outlined">
                     <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
                         Sign in
@@ -149,7 +175,7 @@ export default function SignIn(props) {
                             <FormLabel htmlFor="email">Email</FormLabel>
                             <TextField error={emailError} helperText={emailErrorMessage} id="email" type="email" name="email"
                                 placeholder="your@email.com" autoComplete="email" autoFocus required fullWidth variant="outlined"
-                                color={emailError ? 'error' : 'primary'} sx={{ ariaLabel: 'email' }} onChange={handleChange}/>
+                                color={emailError ? 'error' : 'primary'} sx={{ ariaLabel: 'email' }} onChange={handleChange} />
                         </FormControl>
                         <FormControl>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -159,8 +185,8 @@ export default function SignIn(props) {
                                 </Link>
                             </Box>
                             <TextField error={passwordError} helperText={passwordErrorMessage} name="password" placeholder="Password"
-                                type="password" id="password" autoComplete="current-password" autoFocus required fullWidth 
-                                variant="outlined" color={passwordError ? 'error' : 'primary'} onChange={handleChange}/>
+                                type="password" id="password" autoComplete="current-password" autoFocus required fullWidth
+                                variant="outlined" color={passwordError ? 'error' : 'primary'} onChange={handleChange} />
                         </FormControl>
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}

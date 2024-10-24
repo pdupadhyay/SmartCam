@@ -3,12 +3,15 @@ const authService = require('../services/authService');
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const token = await authService.login(email, password);
+    const {token, user} = await authService.login(email, password);
+    console.log(token)
     res.cookie("token", token, {
       expires: new Date(Date.now() + 8 * 3600000),
+      httpOnly: true,
+      secure: true,
     });
-    res.send("Login successfull");
-    
+    res.send(user);
+
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -23,4 +26,4 @@ const logout = async (req, res) => {
 
 
 
-module.exports = { login , logout};
+module.exports = { login, logout };
