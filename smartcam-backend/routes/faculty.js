@@ -125,7 +125,7 @@ router.get('/:faculty_id/attendance', verifyToken, roleCheck(['faculty', 'admin'
 // Apply for leave
 router.post('/leave', verifyToken, roleCheck(['faculty']), async (req, res) => {
   try {
-    const { leaveDate, leaveReason } = req.body;
+    const { fromDate, toDate, leaveReason } = req.body;
 
     // Ensure fromDate, toDate, and leaveReason are provided
     if (!fromDate || !toDate || !leaveReason) {

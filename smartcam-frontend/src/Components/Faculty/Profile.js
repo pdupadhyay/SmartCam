@@ -1,6 +1,7 @@
 import { FormControl, Typography, Box, FormLabel, TextField, RadioGroup, FormControlLabel, Radio, Button, Divider, Link, createTheme, ThemeProvider, styled, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import MuiCard from '@mui/material/Card';
+import { facultyURL } from "../../constants";
 
 const ProfileContainer = styled(Stack)(({ theme }) => ({
     height: '100%',
@@ -78,7 +79,7 @@ const Profile = () => {
     const [popupMessage, setPopupMessage] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:5050/api/faculty/profile',
+        fetch(`${facultyURL}/profile`,
             {
                 method: 'GET',
                 headers: {
@@ -108,7 +109,7 @@ const Profile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('http://localhost:5050/api/faculty/profile',
+        fetch(`${facultyURL}/profile`,
             {
                 method: 'PUT',
                 headers: {

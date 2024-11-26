@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/auth", auth);
-// app.use("/api/admin", admin);
+app.use("/api/admin", admin);
 app.use('/api/faculty', faculty);
 
 

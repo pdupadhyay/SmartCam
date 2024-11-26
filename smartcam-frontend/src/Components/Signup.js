@@ -13,6 +13,7 @@ import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import bgimage from './../Content/BG.png'
+import { facultyURL } from '../constants';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -74,6 +75,7 @@ export default function SignUp() {
         phoneNumber: '',
         image: null
     })
+    document.title = 'SmartCam - Sign up';
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -176,7 +178,7 @@ export default function SignUp() {
         formData.append('image', imageFile);
 
         if (validateInputs()) {
-            fetch('http://localhost:5050/api/faculty/register',
+            fetch(`${facultyURL}/register`,
                 {
                     method: 'POST',
                     body: formData,
@@ -259,7 +261,7 @@ export default function SignUp() {
                             <Typography sx={{ textAlign: 'center' }}>
                                 Already have an account?{' '}
                                 <span>
-                                    <Link href="/login" variant="body2" sx={{ alignSelf: 'center' }} >
+                                    <Link href="/" variant="body2" sx={{ alignSelf: 'center' }} >
                                         Sign in
                                     </Link>
                                 </span>

@@ -64,16 +64,16 @@ router.put('/leave/:leave_id', verifyToken, roleCheck(['admin']), async (req, re
   
       // If approved, update the faculty attendance status
       if (status === 'Approved') {
-        const fromDate = new Date(leaveApplication.fromDate);
-        const toDate = new Date(leaveApplication.toDate);
-        const facultyId = leaveApplication.faculty_id;
+        const fromDate = new Date(leave.fromDate);
+        const toDate = new Date(leave.toDate);
+        const facultyId = leave.faculty_id;
   
         // Loop through each date between fromDate and toDate
         for (let date = fromDate; date <= toDate; date.setDate(date.getDate() + 1)) {
           const attendanceDate = date.toISOString().split('T')[0];  // Convert to YYYY-MM-DD
   
           // Update the faculty's attendance status to 'L' for each leave date
-          await FacultyAttendance.updateOne(
+          const res = await facultyAttendance.updateOne(
             { faculty_id: facultyId, attendanceDate: attendanceDate },
             { facultyStatus: 'L' },
             { upsert: true }  // Create a new attendance record if one doesn't exist

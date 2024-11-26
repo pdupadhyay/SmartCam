@@ -1,8 +1,10 @@
 import styled from "@emotion/styled";
-import { colors, List, ListItem, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
 import logo from './../Content/Logo.png';
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
+import { baseURL } from "../constants";
 
 const SidebarContainer = styled(Stack)(({ theme }) => ({
     width: '18%',
@@ -18,10 +20,11 @@ const SidebarContainer = styled(Stack)(({ theme }) => ({
 const Sidebar = ({ userName, setUserName, children }) => {
     const [currentTab, setCurrentTab] = useState('Home');
     const navigate = useNavigate();
+    const facultyId = localStorage.getItem('id');
 
     const handleClick = (tabText, url) => {
         if (tabText === "Logout") {
-            fetch('http://localhost:5050/api/auth/logout', {
+            fetch(`${baseURL}/auth/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,17 +50,17 @@ const Sidebar = ({ userName, setUserName, children }) => {
     ]
     if (localStorage.getItem('role') === 'faculty') {
         sidebarListItem = [
-            { text: 'Home', url: '' },
-            { text: 'Request Leave', url: 'requestleave' },
-            { text: 'Profile', url: 'profile' },
-            { text: `Logout`, url: '' }
+            { text: 'Home', url: `faculty/${facultyId}/dashboard` },
+            { text: 'Request Leave', url: `faculty/${facultyId}/requestleave` },
+            { text: 'Profile', url: `faculty/${facultyId}/profile` },
+            { text: `Logout`, url: `` }
         ];
     } else if (localStorage.getItem('role') === 'admin') {
         sidebarListItem = [
-            { text: 'Home', url: '' },
-            { text: 'Manage Users', url: 'manageUsers' },
-            { text: 'Attendance', url: 'attendance' },
-            { text: 'Notifications', url: 'notifications' },
+            { text: 'Home', url: `admin/dashboard` },
+            { text: 'Manage Users', url: 'admin/manageUsers' },
+            { text: 'Attendance', url: 'admin/attendance' },
+            { text: 'Leave Requests', url: 'admin/leave-requests/pending' },
             { text: `Logout`, url: '' }
         ]
     }

@@ -10,7 +10,7 @@ const login = async (email, password) => {
   if (!isMatch) throw new Error('Invalid credentials');
 
   // Generate JWT token
-  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ id: user.fid, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
   return { token, user };
 };
 

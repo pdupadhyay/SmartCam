@@ -16,6 +16,7 @@ import ForgotPassword from './ForgotPassword';
 import { ThemeProvider } from '@emotion/react';
 import { useState } from 'react';
 import bgimage from './../Content/BG.png'
+import { baseURL } from '../constants';
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
@@ -72,6 +73,7 @@ const ErrorPopup = ({ message, onClose }) => (
 );
 
 export default function SignIn(props) {
+    document.title = 'SmartCam - Sign in';
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState(false);
@@ -84,7 +86,8 @@ export default function SignIn(props) {
         password: ''
     })
 
-    const handleClickOpen = () => {
+    const handleClickOpen = (event) => {
+        event.preventDefault();
         setOpen(true);
     };
 
@@ -99,7 +102,7 @@ export default function SignIn(props) {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        fetch('http://localhost:5050/api/auth/login',
+        fetch(`${baseURL}/auth/login`,
             {
                 method: 'POST',
                 headers: {
@@ -111,12 +114,12 @@ export default function SignIn(props) {
             .then(
                 response => response.json())
             .then((data) => {
-                console.log(data);
                 if (!data.message) {
-                    console.log('Logged in successfully');
+                    localStorage.clear()
                     localStorage.setItem('role', data.role);
                     localStorage.setItem('userName', data.name);
-                    window.location.href = '/';
+                    localStorage.setItem('id', data.fid);
+                    window.location.href = `/faculty/${data.fid}/dashboard/`;
                 } else {
                     console.log('Login failed');
                     setErrorMessage('Login failed. Please check your credentials and try again.');
